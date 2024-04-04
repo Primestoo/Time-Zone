@@ -90,7 +90,12 @@ function getCurrentTimes() {
   document.getElementById('timeResults').innerHTML = '';
 
   selectedCities.forEach(city => {
-    fetch(`https://worldtimeapi.org/api/timezone/${city}`)
+    fetch(`https://worldtimeapi.org/api/timezone/${city}`, {
+      mode: 'cors', // Ensure that CORS is enabled
+      headers: {
+        'Access-Control-Allow-Origin': '*' // Allow requests from any origin
+      }
+    })
       .then(response => response.json())
       .then(data => {
         var currentTime = new Date(data.utc_datetime);
@@ -107,4 +112,4 @@ function getCurrentTimes() {
 </script>
 
 </body>
-  </html>
+</html>
