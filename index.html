@@ -60,6 +60,11 @@ button:hover {
   font-size: 18px;
   margin-bottom: 10px;
 }
+
+.error-message {
+  color: red;
+  font-weight: bold;
+}
 </style>
 </head>
 <body>
@@ -80,23 +85,27 @@ button:hover {
   </form>
 
   <div id="timeResults" class="results"></div>
+  <p id="errorMessage" class="error-message" style="display: none;"></p>
 </div>
 
 <script>
 function getCurrentTimes() {
   var selectedCities = Array.from(document.getElementById('cities').selectedOptions).map(option => option.value);
 
-  // Clear previous results
+  // Clear previous results and hide error message
   document.getElementById('timeResults').innerHTML = '';
+  document.getElementById('errorMessage').style.display = 'none';
 
   selectedCities.forEach(city => {
     fetch(`https://worldtimeapi.org/api/timezone/${city}`, {
-      mode: 'cors', // Ensure that CORS is enabled
-      headers: {
-        'Access-Control-Allow-Origin': '*' // Allow requests from any origin
-      }
+      mode: 'cors' // Ensure that CORS is enabled
     })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching time for ' + city + '. Please try again later.');
+        }
+        return response.json();
+      })
       .then(data => {
         var currentTime = new Date(data.utc_datetime);
         var cityTime = currentTime.toLocaleTimeString();
@@ -106,7 +115,11 @@ function getCurrentTimes() {
         resultElement.textContent = `Current time in ${cityName}: ${cityTime}`;
         document.getElementById('timeResults').appendChild(resultElement);
       })
-      .catch(error => console.error('Error fetching time:', error));
+      .catch(error => {
+        // Display error message on the webpage
+        document.getElementById('errorMessage').textContent = error.message;
+        document.getElementById('errorMessage').style.display = 'block';
+      });
   });
 }
 </script>
