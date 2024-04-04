@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Current Time in Selected Cities</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+.container {
+  max-width: 800px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+form {
+  text-align: center;
+}
+
+select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.results {
+  margin-top: 20px;
+}
+
+.results p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Current Time in Selected Cities</h1>
+
+  <form id="cityForm">
+    <label for="cities">Select cities:</label><br>
+    <select id="cities" multiple>
+      <option value="America/New_York">New York</option>
+      <option value="America/Los_Angeles">Los Angeles</option>
+      <option value="America/Phoenix">Phoenix</option>
+      <option value="Europe/London">London</option>
+      <!-- Add more options for other cities -->
+    </select>
+    <button type="button" onclick="getCurrentTimes()">Get Current Time</button>
+  </form>
+
+  <div id="timeResults" class="results"></div>
+</div>
+
+<script>
+function getCurrentTimes() {
+  var selectedCities = Array.from(document.getElementById('cities').selectedOptions).map(option => option.value);
+
+  // Clear previous results
+  document.getElementById('timeResults').innerHTML = '';
+
+  selectedCities.forEach(city => {
+    fetch(`https://worldtimeapi.org/api/timezone/${city}`)
+      .then(response => response.json())
+      .then(data => {
+        var currentTime = new Date(data.utc_datetime);
+        var cityTime = currentTime.toLocaleTimeString();
+        var cityName = city.split('/').pop().replace('_', ' ');
+
+        var resultElement = document.createElement('p');
+        resultElement.textContent = `Current time in ${cityName}: ${cityTime}`;
+        document.getElementById('timeResults').appendChild(resultElement);
+      })
+      .catch(error => console.error('Error fetching time:', error));
+  });
+}
+</script>
+
+</body>
+  </html>
